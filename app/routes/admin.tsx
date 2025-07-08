@@ -161,93 +161,126 @@ function NoteEditor() {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<NoteCategory>("Personal Reflection");
   const [author, setAuthor] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const [charCount, setCharCount] = useState(0);
   
   const navigation = useNavigation();
   const actionData = useActionData();
   
   const isSubmitting = navigation.state === "submitting";
-  
   const categories: NoteCategory[] = ["Clinical Observation", "Personal Reflection", "Study Note", "Quote"];
   
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+    setCharCount(e.target.value.length);
+  };
+
   const handleSubmit = () => {
     setContent("");
     setAuthor("");
+    setCharCount(0);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Write a New Note</h2>
-      
+    <div className="relative max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      {/* Status messages */}
       {actionData?.error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-800 text-sm">{actionData.error}</p>
+        <div className="mb-6 p-3 text-red-800 bg-red-50 rounded-md transition-all duration-300">
+          <p className="text-sm">{actionData.error}</p>
         </div>
       )}
       
       {actionData?.success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-          <p className="text-green-800 text-sm">{actionData.message}</p>
+        <div className="mb-6 p-3 text-green-800 bg-green-50 rounded-md transition-all duration-300">
+          <p className="text-sm">{actionData.message}</p>
         </div>
       )}
       
-      <Form method="post" onSubmit={handleSubmit} className="space-y-6">
+      <Form method="post" onSubmit={handleSubmit} className="space-y-8">
         <input type="hidden" name="_action" value="create" />
         
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
+        {/* Category selector - minimal and subtle */}
+        <div className="relative inline-block">
           <select
             id="category"
             name="category"
             value={category}
             onChange={(e) => setCategory(e.target.value as NoteCategory)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className="appearance-none bg-transparent border-0 border-b border-gray-200 focus:border-gray-900 focus:ring-0 pr-8 py-1 text-sm text-gray-600 font-sans focus:outline-none transition-colors duration-200 cursor-pointer"
           >
             {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat} className="bg-white">{cat}</option>
             ))}
           </select>
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
         
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-            Your Thought
-          </label>
+        {/* Main content area */}
+        <div className="relative">
           <textarea
             id="content"
             name="content"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={6}
+            onChange={handleContentChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            rows={10}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
-            placeholder="Write your note, observation, or reflection here..."
+            className={`w-full p-0 text-xl leading-relaxed font-sans text-gray-900 bg-transparent border-0 resize-none focus:ring-0 focus:outline-none placeholder-gray-300 transition-all duration-200 ${
+              isFocused ? 'opacity-100' : 'opacity-90 hover:opacity-100'
+            }`}
+            placeholder="What's on your mind..."
+            style={{ minHeight: '300px' }}
           />
+          
+          {/* Subtle bottom border that animates on focus */}
+          <div className={`h-px bg-gray-200 transition-all duration-300 ${
+            isFocused ? 'bg-gray-900 scale-x-100' : 'scale-x-90 origin-left'
+          }`}></div>
+          
+          {/* Character count */}
+          <div className="mt-2 text-right">
+            <span className={`text-xs font-mono transition-opacity duration-200 ${
+              charCount > 0 ? 'opacity-60' : 'opacity-0'
+            }`}>
+              {charCount} characters
+            </span>
+          </div>
         </div>
         
-        <div>
-          <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-2">
-            Author <span className="text-gray-500">(optional, for quotes)</span>
-          </label>
-          <input
-            type="text"
-            id="author"
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-            placeholder="e.g., Hippocrates, Maya Angelou"
-          />
-        </div>
+        {/* Author input - appears only when needed */}
+        {(category === 'Quote' || author) && (
+          <div className="mt-8 pt-4 border-t border-gray-100">
+            <input
+              type="text"
+              id="author"
+              name="author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              className="w-full px-0 py-2 bg-transparent border-0 border-b border-transparent focus:border-gray-300 focus:outline-none focus:ring-0 font-sans text-gray-600 placeholder-gray-400 transition-colors duration-200"
+              placeholder="— Author (optional)"
+            />
+          </div>
+        )}
         
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-gray-900 text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Publishing..." : "Publish Note"}
-        </button>
+        {/* Submit button - subtle and minimal */}
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isSubmitting || !content.trim()}
+            className={`px-6 py-2 text-sm font-sans tracking-wide uppercase transition-all duration-200 ${
+              content.trim() 
+                ? 'text-gray-900 hover:text-white hover:bg-gray-900' 
+                : 'text-gray-300 cursor-not-allowed'
+            }`}
+          >
+            {isSubmitting ? 'Publishing...' : 'Publish'}
+          </button>
+        </div>
       </Form>
     </div>
   );
