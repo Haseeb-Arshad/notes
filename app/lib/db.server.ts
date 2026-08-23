@@ -65,46 +65,45 @@ const SEED_NOTES: Array<{ date: string; content: string; author?: string }> = [
   {
     date: "2025-06-22",
     content:
-      "The most critical skill in medicine isn't diagnosis or treatment—it's learning to truly listen to your patients.",
-    author: "Dr. Atul Gawande",
+      "The palest ink is better than the best memory. Write it down before the day takes it from you.",
+    author: "Chinese proverb",
   },
   {
     date: "2025-06-20",
-    content:
-      "If you listen carefully, the patient will tell you the diagnosis.",
-    author: "Dr. William Osler",
+    content: "How do I know what I think until I see what I say?",
+    author: "E. M. Forster",
   },
   {
     date: "2025-06-15",
     content:
-      "USMLE Step 1 prep: Focus on high-yield concepts and active recall, not passive reading.",
+      "Keep a notebook. Travel with it, eat with it, sleep with it. It becomes your closest companion.",
   },
   {
     date: "2025-06-10",
     content:
-      "Today I realized that sometimes the most powerful medicine we can offer is simply being present.",
+      "Today I realized that writing something down is the first step to understanding it.",
   },
   {
     date: "2025-05-25",
     content:
-      "The key to the Krebs cycle isn't memorizing each step, but understanding why each conversion occurs and the energy captured.",
+      "Your mind is for having ideas, not holding them. The moment an idea matters, give it a page.",
+    author: "David Allen",
   },
   {
     date: "2025-05-20",
-    content:
-      "The good physician treats the disease; the great physician treats the patient who has the disease.",
-    author: "Sir William Osler",
+    content: "Simplicity is the ultimate sophistication.",
+    author: "Leonardo da Vinci",
   },
   {
     date: "2025-05-15",
     content:
-      "Studying medicine is like trying to drink from a fire hydrant. Focus on understanding concepts, not memorizing facts.",
+      "A page a day is a book a year. Small, steady notes beat one grand plan that never starts.",
   },
   {
     date: "2025-05-10",
     content:
-      "Medicine is a science of uncertainty and an art of probability.",
-    author: "Sir William Osler",
+      "We do not remember days; we remember moments. A note is how you keep the moment.",
+    author: "Cesare Pavese",
   },
   {
     date: "2025-04-30",
@@ -113,7 +112,7 @@ const SEED_NOTES: Array<{ date: string; content: string; author?: string }> = [
   {
     date: "2025-04-18",
     content:
-      "Today's patient reminded me that behind every case is a human being with their own story.",
+      "Rereading an old note today felt like receiving a letter from someone who knew me well.",
   },
 ];
 

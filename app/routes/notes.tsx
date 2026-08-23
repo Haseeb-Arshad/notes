@@ -3,8 +3,8 @@ import { Outlet } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "The Whiteboard | Medical Student Notes" },
-    { name: "description", content: "A collection of medical student notes and thoughts" },
+    { title: "The Whiteboard | Notes & Thoughts" },
+    { name: "description", content: "A quiet collection of notes and thoughts" },
   ];
 };
 
