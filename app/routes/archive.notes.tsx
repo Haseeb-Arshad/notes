@@ -3,10 +3,7 @@ import { Link, useLoaderData, useNavigate } from "@remix-run/react";
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
-// Import notes from shared data file
-import { notes, type Note } from "../data/notes";
-
-// Note data is now imported from ../data/notes
+import { listNotes, type Note } from "~/lib/db.server";
 
 interface TimelineItem {
   type: 'year' | 'month' | 'half-month' | 'day';
@@ -102,6 +99,7 @@ function groupNotesForTimeline(notes: Note[]): TimelineItem[] {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const notes = listNotes();
   const timelineData = groupNotesForTimeline(notes);
   return json({ notes, timelineData });
 };
@@ -112,49 +110,11 @@ export default function NotesArchive() {
   const [activeMonth, setActiveMonth] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [localNotes, setLocalNotes] = useState(notes);
-  const [visibleNotes, setVisibleNotes] = useState<Record<string, boolean>>({});
 
-  const handleLike = (noteId: string) => {
-    setLocalNotes(prevNotes =>
-      prevNotes.map(note =>
-        note.id === noteId ? { ...note, liked: !note.liked } : note
-      )
-    );
-  };
-  
   // Handler for navigating to note page
   const handleNoteClick = (noteId: string) => {
     navigate(`/notes/${noteId}`);
   };
-
-  // Track when note elements are visible for lazy loading
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '100px',
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const noteId = entry.target.getAttribute('data-note-id');
-        if (noteId) {
-          if (entry.isIntersecting) {
-            setVisibleNotes(prev => ({ ...prev, [noteId]: true }));
-          }
-        }
-      });
-    }, observerOptions);
-
-    // Observe all note elements
-    const noteElements = document.querySelectorAll('[data-note-id]');
-    noteElements.forEach(element => observer.observe(element));
-
-    return () => {
-      noteElements.forEach(element => observer.unobserve(element));
-    };
-  }, []);
 
   // Handle scroll to track progress and update active month
   useEffect(() => {
@@ -300,63 +260,6 @@ export default function NotesArchive() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Hot-scrollbar timeline */}
-        <div 
-          className="hidden md:block w-20 py-8 px-2 fixed right-0 top-0 h-full" 
-          style={{ backgroundColor: '#fdfaf8' }}
-        >
-          <div className="h-full flex flex-col items-center justify-center relative">
-            {/* Visual timeline track */}
-            <div 
-              className="absolute w-0.5 bg-gray-200 h-3/4 rounded-full" 
-              style={{ top: '12.5%' }}
-            ></div>
-
-            {/* Scrollbar indicator */}
-            <motion.div 
-              className="absolute w-3 h-3 rounded-full bg-gray-800 z-10"
-              style={{ 
-                top: `calc(12.5% + ${scrollPosition}% * 0.75)`,
-                left: 'calc(50% - 6px)'
-              }}
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            />
-
-            {/* Month markers */}
-            {timelineData.map((item, index) => {
-              // Calculate position along the timeline
-              const position = index / (timelineData.length - 1 || 1);
-              const topPosition = 12.5 + position * 75;
-              
-              return (
-                <div 
-                  key={item.period}
-                  className="absolute cursor-pointer flex flex-col items-center"
-                  style={{ top: `${topPosition}%`, left: '50%', transform: 'translateX(-50%)' }}
-                  onClick={() => scrollToMonth(item.period)}
-                >
-                  <div 
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${activeMonth === item.period ? 'scale-150 bg-gray-800' : 'bg-gray-400'}`}
-                    style={{ transform: `translateX(-50%)` }}
-                  ></div>
-                  <span 
-                    className={`text-xs whitespace-nowrap transform -rotate-90 origin-left mt-1 transition-all duration-300 ${activeMonth === item.period ? 'text-gray-800 font-medium' : 'text-gray-400'}`}
-                    style={{ 
-                      position: 'absolute',
-                      left: '10px', 
-                      width: 'max-content'
-                    }}
-                  >
-                    {item.period.split(' ')[0]}
-                  </span>
-                </div>
-              );
-            })}
           </div>
         </div>
 
