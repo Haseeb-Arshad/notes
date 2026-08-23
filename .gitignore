@@ -3,3 +3,6 @@ node_modules
 /.cache
 /build
 .env
+
+# SQLite data directory (created at runtime)
+.data/

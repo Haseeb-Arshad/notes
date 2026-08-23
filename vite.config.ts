@@ -21,4 +21,9 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  // better-sqlite3 is a native module — it must stay external to the SSR
+  // bundle so Node loads it directly at runtime.
+  ssr: {
+    external: ["better-sqlite3"],
+  },
 });
