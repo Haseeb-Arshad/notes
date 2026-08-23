@@ -21,8 +21,7 @@ const notes: Note[] = [
   {
     id: "2",
     date: "June 20, 2025",
-    content: "Today I realized that sometimes the most powerful medicine we can offer is simply being present.",
-    author: "Maryam"
+    content: "Today I realized that sometimes the most powerful medicine we can offer is simply being present."
   },
   {
     id: "3",
@@ -33,8 +32,7 @@ const notes: Note[] = [
   {
     id: "4",
     date: "June 15, 2025",
-    content: "USMLE Step 1 prep: Focus on high-yield concepts and active recall, not passive reading.",
-    author: "Maryam"
+    content: "USMLE Step 1 prep: Focus on high-yield concepts and active recall, not passive reading."
   },
   {
     id: "5",
@@ -57,8 +55,7 @@ const notes: Note[] = [
   {
     id: "8",
     date: "May 25, 2025",
-    content: "The key to the Krebs cycle isn't memorizing each step, but understanding why each conversion occurs and the energy captured.",
-    author: "Maryam"
+    content: "The key to the Krebs cycle isn't memorizing each step, but understanding why each conversion occurs and the energy captured."
   },
   {
     id: "9",
@@ -69,8 +66,7 @@ const notes: Note[] = [
   {
     id: "10",
     date: "May 15, 2025",
-    content: "Today's patient reminded me that behind every case is a human being with their own story.",
-    author: "Maryam"
+    content: "Today's patient reminded me that behind every case is a human being with their own story."
   },
 ];
 

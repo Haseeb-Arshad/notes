@@ -4,22 +4,20 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLoaderData } from "@remix-run/react";
 
-// Simple note type with inferred heading
+// Simple note type
 interface Note {
   id: string;
   date: string;
-  heading: string;
   content: string;
   author?: string;
   slug: string;
 }
 
-// Sample notes data with headings and slugs
+// Sample notes data with slugs
 const sampleNotes: Note[] = [
   {
     id: "1",
     date: "June 22, 2025",
-    heading: "Patient Care",
     content: "The most critical skill in medicine isn't diagnosis or treatment—it's learning to truly listen to your patients.",
     author: "Dr. Atul Gawande",
     slug: "art-of-listening"
@@ -27,14 +25,12 @@ const sampleNotes: Note[] = [
   {
     id: "2",
     date: "May 15, 2025",
-    heading: "Reflection",
     content: "Today I realized that sometimes the most powerful medicine we can offer is simply being present.",
     slug: "power-of-presence"
   },
   {
     id: "3",
     date: "April 30, 2025",
-    heading: "Wisdom",
     content: "If you listen carefully, the patient will tell you the diagnosis.",
     author: "Dr. William Osler",
     slug: "patient-diagnosis"
@@ -42,21 +38,18 @@ const sampleNotes: Note[] = [
   {
     id: "4",
     date: "April 10, 2025",
-    heading: "Study",
     content: "USMLE Step 1 prep: Focus on high-yield concepts and active recall, not passive reading.",
     slug: "usmle-prep"
   },
   {
     id: "5",
     date: "March 22, 2025",
-    heading: "Perspective",
     content: "Studying medicine is like trying to drink from a fire hydrant. Focus on understanding concepts, not memorizing facts.",
     slug: "conceptual-learning"
   },
   {
     id: "6",
     date: "February 28, 2025",
-    heading: "Motivation",
     content: "When you feel like giving up, remember why you started.",
     slug: "remember-why"
   },
@@ -125,14 +118,11 @@ function SilentApplause({ noteId }: { noteId: string }) {
 function Note({ note }: { note: Note }) {
   return (
     <div className="space-y-6">
-      {/* Dateline with short text/context */}
+      {/* Dateline */}
       <div className="flex items-center space-x-1">
         <p className="text-sm font-normal text-gray-500">
           {note.date}
         </p>
-        <span className="text-sm font-normal text-gray-500">
-          , {note.heading}
-        </span>
       </div>
       
       {/* Main saying/note with limited width and smaller text */}
@@ -253,7 +243,7 @@ export default function NotesIndex() {
 
         {/* Footer text */}
         <footer className="pb-8 text-left text-gray-400 text-sm">
-          A collection of notes by Maryam Sumbal.
+          A collection of notes and thoughts.
         </footer>
       </div>
     </div>

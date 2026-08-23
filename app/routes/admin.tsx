@@ -6,19 +6,22 @@ import { useState } from "react";
 export const meta: MetaFunction = () => {
   return [
     { title: "Admin - The Whiteboard" },
-    { name: "description", content: "Private writing space for Maryam's notes." },
+    { name: "description", content: "Private writing space for notes." },
   ];
 };
 
-// Simple session management (in production, use proper session storage)
-const ADMIN_PASSWORD = "maryam2025"; // In production, this should be in environment variables
+// Simple session management (in production, this should be in environment variables)
+const ADMIN_PASSWORD = "admin2025"; // In production, use environment variables
 
-type NoteCategory = "Clinical Observation" | "Personal Reflection" | "Study Note" | "Quote";
+type ActionData = {
+  error?: string;
+  success?: boolean;
+  message?: string;
+};
 
 interface AdminNote {
   id: string;
   date: string;
-  category: NoteCategory;
   content: string;
   author?: string;
 }
@@ -29,33 +32,28 @@ let adminNotes: AdminNote[] = [
   {
     id: "1",
     date: "June 22, 2025",
-    category: "Clinical Observation",
     content: "The art of medicine consists of amusing the patient while nature cures the disease.",
     author: "Voltaire"
   },
   {
     id: "2", 
     date: "June 21, 2025",
-    category: "Personal Reflection",
     content: "Every patient teaches you something new. Today I learned that sometimes healing begins with simply being heard."
   },
   {
     id: "3",
     date: "June 20, 2025", 
-    category: "Study Note",
     content: "The heart has four chambers, but it takes just one moment of compassion to fill them all."
   },
   {
     id: "4",
     date: "June 19, 2025",
-    category: "Quote", 
     content: "Medicine is not only a science; it is also an art. It does not consist of compounding pills and plasters; it deals with the very processes of life.",
     author: "Paracelsus"
   },
   {
     id: "5",
     date: "June 18, 2025",
-    category: "Clinical Observation",
     content: "In the ICU tonight, I witnessed the profound silence that exists between life and death. It taught me more than any textbook ever could."
   }
 ];
@@ -85,11 +83,10 @@ export const action: ActionFunction = async ({ request }) => {
   
   if (action === "create") {
     const content = formData.get("content") as string;
-    const category = formData.get("category") as NoteCategory;
     const author = formData.get("author") as string;
     
-    if (!content || !category) {
-      return json({ error: "Content and category are required" }, { status: 400 });
+    if (!content) {
+      return json({ error: "Content is required" }, { status: 400 });
     }
     
     const newNote: AdminNote = {
@@ -99,7 +96,6 @@ export const action: ActionFunction = async ({ request }) => {
         month: "long", 
         day: "numeric" 
       }),
-      category,
       content,
       author: author || undefined
     };
@@ -159,16 +155,14 @@ function LoginForm() {
 
 function NoteEditor() {
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<NoteCategory>("Personal Reflection");
   const [author, setAuthor] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [charCount, setCharCount] = useState(0);
   
   const navigation = useNavigation();
-  const actionData = useActionData();
+  const actionData = useActionData() as ActionData | undefined;
   
   const isSubmitting = navigation.state === "submitting";
-  const categories: NoteCategory[] = ["Clinical Observation", "Personal Reflection", "Study Note", "Quote"];
   
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
@@ -198,26 +192,6 @@ function NoteEditor() {
       
       <Form method="post" onSubmit={handleSubmit} className="space-y-8">
         <input type="hidden" name="_action" value="create" />
-        
-        {/* Category selector - minimal and subtle */}
-        <div className="relative inline-block">
-          <select
-            id="category"
-            name="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as NoteCategory)}
-            className="appearance-none bg-transparent border-0 border-b border-gray-200 focus:border-gray-900 focus:ring-0 pr-8 py-1 text-sm text-gray-600 font-sans focus:outline-none transition-colors duration-200 cursor-pointer"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat} className="bg-white">{cat}</option>
-            ))}
-          </select>
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
         
         {/* Main content area */}
         <div className="relative">
@@ -252,20 +226,18 @@ function NoteEditor() {
           </div>
         </div>
         
-        {/* Author input - appears only when needed */}
-        {(category === 'Quote' || author) && (
-          <div className="mt-8 pt-4 border-t border-gray-100">
-            <input
-              type="text"
-              id="author"
-              name="author"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              className="w-full px-0 py-2 bg-transparent border-0 border-b border-transparent focus:border-gray-300 focus:outline-none focus:ring-0 font-sans text-gray-600 placeholder-gray-400 transition-colors duration-200"
-              placeholder="— Author (optional)"
-            />
-          </div>
-        )}
+        {/* Author input - optional */}
+        <div className="mt-8 pt-4 border-t border-gray-100">
+          <input
+            type="text"
+            id="author"
+            name="author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            className="w-full px-0 py-2 bg-transparent border-0 border-b border-transparent focus:border-gray-300 focus:outline-none focus:ring-0 font-sans text-gray-600 placeholder-gray-400 transition-colors duration-200"
+            placeholder="— Author (optional)"
+          />
+        </div>
         
         {/* Submit button - subtle and minimal */}
         <div className="pt-4">
@@ -288,15 +260,8 @@ function NoteEditor() {
 
 function NoteDashboard({ notes }: { notes: AdminNote[] }) {
   const navigation = useNavigation();
-  const actionData = useActionData();
+  const actionData = useActionData() as ActionData | undefined;
   
-  const categoryColors: Record<NoteCategory, string> = {
-    "Clinical Observation": "text-blue-600 bg-blue-50",
-    "Personal Reflection": "text-amber-600 bg-amber-50", 
-    "Study Note": "text-gray-600 bg-gray-50",
-    "Quote": "text-purple-600 bg-purple-50"
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
       <div className="flex justify-between items-center mb-6">
@@ -313,10 +278,7 @@ function NoteDashboard({ notes }: { notes: AdminNote[] }) {
       <div className="space-y-4">
         {notes.map((note) => (
           <div key={note.id} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex justify-between items-start mb-2">
-              <span className={`text-xs px-2 py-1 rounded-full ${categoryColors[note.category]}`}>
-                {note.category}
-              </span>
+            <div className="flex justify-end items-center mb-2">
               <span className="text-xs text-gray-500">{note.date}</span>
             </div>
             
